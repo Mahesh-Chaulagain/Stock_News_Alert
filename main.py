@@ -38,15 +38,20 @@ print(day_before_yesterday_closing_price)
 
 # Find the positive difference between 1 and 2. e.g. 40 - 20 = -20, but the positive difference is 20.
 # Hint: https://www.w3schools.com/python/ref_func_abs.asp
-difference = abs(float(yesterday_closing_price) - float(day_before_yesterday_closing_price))
-print(difference)
+difference = float(yesterday_closing_price) - float(day_before_yesterday_closing_price)
+up_down = None
+if difference > 0:
+    up_down = "🔺"
+else:
+    up_down = "🔻"
 
 # calculate percentage difference in price between closing price yesterday and closing price the day before yesterday.
-diff_percent = (difference / float(yesterday_closing_price)) * 100
+diff_percent = round((difference / float(yesterday_closing_price)) * 100)
 print(diff_percent)
 
-# If diff_percentage is greater than 2 then print("Get News").
-if diff_percent > 2:
+
+# If diff_percentage is greater than 1 then print("Get News").
+if abs(diff_percent) > 1:
     # fetch news data
     news_parameters = {
         "qInTitle": COMPANY_NAME,
@@ -59,7 +64,7 @@ if diff_percent > 2:
     print(three_articles)
 
     # Create a new list of the first 3 article's headline and description using list comprehension.
-    formatted_articles = [f"Headline: {article['title']}. \nBrief: {article['description']}" for article in three_articles]
+    formatted_articles = [f"{STOCK_NAME}:{up_down}{diff_percent}%\nHeadline: {article['title']}. \nBrief: {article['description']}" for article in three_articles]
     # Send each article as a separate message via Twilio.
     client = Client(TWILIO_SID, TWILIO_AUTH_TOKEN)
 
@@ -70,16 +75,4 @@ if diff_percent > 2:
             from_=os.getenv("FROM_NUMBER"),
             to=os.getenv("TO_NUMBER")
         )
-
-
-#Optional TODO: Format the message like this:
-"""
-TSLA: 🔺2%
-Headline: Were Hedge Funds Right About Piling Into Tesla Inc. (TSLA)?. 
-Brief: We at Insider Monkey have gone over 821 13F filings that hedge funds and prominent investors are required to file by the SEC The 13F filings show the funds' and investors' portfolio positions as of March 31st, near the height of the coronavirus market crash.
-or
-"TSLA: 🔻5%
-Headline: Were Hedge Funds Right About Piling Into Tesla Inc. (TSLA)?. 
-Brief: We at Insider Monkey have gone over 821 13F filings that hedge funds and prominent investors are required to file by the SEC The 13F filings show the funds' and investors' portfolio positions as of March 31st, near the height of the coronavirus market crash.
-"""
 
